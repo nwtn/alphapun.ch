@@ -168,9 +168,7 @@
 
 			/* function to find paths for opaque objects in the image */
 			this.fpo				= function() {
-				var ec = 0,	// emergency counter
-					i = 1,	// counter
-					r;		// results
+				var i = 1, r;
 
 				// canvas!
 				this.pc();
@@ -192,8 +190,6 @@
 					if (r !== bf) { this.po.push(r); }
 
 					i++;
-					ec++;
-					if (ec === 100) { r = bf; }
 				}
 				db.removeChild(this.cnv);
 			};
@@ -201,7 +197,6 @@
 			/* function to find paths for transparent parts of opaque objects (ie holes) in the image */
 			this.fpt				= function() {
 				var ctx = this.ctx,
-					ec = 0,	// emergency counter
 					i,
 					j,
 					k,
@@ -214,15 +209,11 @@
 				// draw the existing opaque paths as a filled mc (missingColor) shape
 				for (i=0; i < this.po.length; i++) {
 					p = this.po[i];
-					if (p.x.length == 1) {
-						ctx.fillRect(p.x[0],p.y[0],1,1);
-					} else {
-						ctx.fillStyle = this.mcr;
-						ctx.beginPath();
-						ctx.moveTo(p.x[0],p.y[0]);
-						for (j=1; j<p.x.length; j++) { ctx.lineTo(p.x[j],p.y[j]); }
-						ctx.fill();
-					}
+					ctx.fillStyle = this.mcr;
+					ctx.beginPath();
+					ctx.moveTo(p.x[0],p.y[0]);
+					for (j=1; j<p.x.length; j++) { ctx.lineTo(p.x[j],p.y[j]); }
+					ctx.fill();
 				}
 
 				// draw the image over it
@@ -265,8 +256,6 @@
 
 					r = this.mn(k);
 					if (r !== bf) { this.pt.push(r); }
-					ec++;
-					if (ec === 100) { r = bf; }
 				}
 
 				db.removeChild(this.cnv);
@@ -313,6 +302,7 @@
 				// (though we're not actually checking for that right now)
 				while (sc < 2) {
 					if (s.x === c.x && s.y === c.y) { sc++; }
+
 					this.px = 4*c.y*this.imgW + 4*(c.x+1) - 1;
 					t = imgPD[this.px];
 
@@ -330,16 +320,16 @@
 					}
 
 					ec++;
-					if (ec === 100000) { sc = 2; }
+					if (ec === 100000) { db.removeChild(this.cnv); throw 1; }
 				}
-				
-				/*
+
 				// remove extraneous points
 				// points that form a straight line aren't needed
-				p = { x: [B.x[0]], y: [B.y[0]] };	// points we're keeping
-				this.l = { x: B.x[0], y: B.y[0] };	// last
+				p = { x: [B.x[0]], y: [B.y[0]] };
+				this.l = { x: B.x[0], y: B.y[0] };
+
 				for (j=1; j<B.x.length; j++) {
-				if (B.x[j] !== p.x[p.x.length - 1] && B.y[j] !== p.y[p.y.length - 1]) {
+					if (B.x[j] !== p.x[p.x.length - 1] && B.y[j] !== p.y[p.y.length - 1]) {
 						p.x.push(this.l.x);
 						p.y.push(this.l.y);
 						p.x.push(B.x[j]);
@@ -347,9 +337,7 @@
 					}
 					this.l.x = B.x[j]; this.l.y = B.y[j];
 				}
-				*/
-				p = B;
-				
+
 				// ...also, using Jacob's stop criterion can cause the set of points to be doubled
 				// we'll address that by converting to a string, splitting in two, and replacing extra instances of the original
 				// hacky kinda, but it should work
@@ -489,15 +477,11 @@
 
 				for (var j=0; j<ps.length; j++) {
 					p = ps[j];
-					if (p.x.length == 1) {
-						ctx.fillRect(p.x[0],p.y[0],1,1);
-					} else {
-						ctx.beginPath();
-						ctx.moveTo(p.x[0],p.y[0]);
-						for (var k=1; k<p.x.length; k++) { ctx.lineTo(p.x[k],p.y[k]); }
-						ctx.stroke();
-						ctx.fill();
-					}
+					ctx.beginPath();
+					ctx.moveTo(p.x[0],p.y[0]);
+					for (var k=1; k<p.x.length; k++) { ctx.lineTo(p.x[k],p.y[k]); }
+					ctx.stroke();
+					ctx.fill();
 				}
 				ctx.lineWidth = 1;
 				ctx.globalCompositeOperation = 'source-over';
@@ -922,7 +906,14 @@
 			p.imgW = p.img.offsetWidth + 4;
 			p.imgH = p.img.offsetHeight + 4;
 			try { p.fmc(); } catch(e1) { err(em); return bf; }
-			try { p.fpo(); } catch(e2) { err('Error: no opaque shapes found, or the image was too complex.'); return bf; }
+			try { p.fpo(); } catch(e2) {
+				if (e2 === 1) {
+					err('Error: the image was too complex.');
+				} else {
+					err('Error: no opaque shapes found.');
+				}
+				return bf; 
+			}
 			try { p.fpt(); } catch(e3) { err(em); return bf;  }
 			try { p.cp(); } catch(e4) { err(em); return bf;  }
 			try { p.dr(); } catch(e5) { err(em); return bf; }
@@ -955,7 +946,7 @@
 			js = js.replace(/dce\(/gm,'document.createElement(');
 			js = js.replace(/	/gm,'  ');
 
-			js = "(function() {\n  var coords = { " + fn + ": [" + p.pTxt.substr(2,p.pTxt.length) + "] };" + js + "\n  $('.alphapunch').each( function() {\n    var fist = new APF();\n\n    $(this).find('.aptarget').each( function() {\n      $(this).wrap('&lt;span style=\"display:inline-block;position:relative\" /&gt;');\n      $(this).append('&lt;span class=\"apmask\" id=\"apmask_' + this.id + '\"&gt;&lt;/span&gt;');\n\n      fist.c = document.getElementById('apmask_' + this.id);\n      fist.ds(0,0,this.offsetWidth,this.offsetHeight);\n    });\n\n    $(this).find('img').each( function() {\n      $(this).wrap('&lt;span style=\"display:inline-block;position:relative\" /&gt;');\n      $(this).after('&lt;span class=\"apmask\" id=\"apmask_' + this.id + '\"&gt;&lt;/span&gt;');\n\n      fist.c = document.getElementById('apmask_' + this.id);\n      fist.imgW = this.offsetWidth;\n      fist.imgH = this.offsetHeight;\n      fist.p = coords[this.id];\n      fist.f();\n\n      $('#apmask_' + this.id).click( function() {\n        $('#' + this.id).click();\n        return false;\n      });\n    });\n  });\n})();";
+			js = "(function() {\n  var coords = { " + fn + ": [" + p.pTxt.substr(2,p.pTxt.length) + "] };\n\n" + js + "\n\n  $('.alphapunch').each( function() {\n    var fist = new APF();\n\n    $(this).find('.aptarget').each( function() {\n      $(this).wrap('&lt;span style=\"display:inline-block;position:relative\" /&gt;');\n      $(this).append('&lt;span class=\"apmask\" id=\"apmask_' + this.id + '\"&gt;&lt;/span&gt;');\n\n      fist.c = document.getElementById('apmask_' + this.id);\n      fist.ds(0,0,this.offsetWidth,this.offsetHeight);\n    });\n\n    $(this).find('img').each( function() {\n      $(this).wrap('&lt;span style=\"display:inline-block;position:relative\" /&gt;');\n      $(this).after('&lt;span class=\"apmask\" id=\"apmask_' + this.id + '\"&gt;&lt;/span&gt;');\n\n      fist.c = document.getElementById('apmask_' + this.id);\n      fist.imgW = this.offsetWidth;\n      fist.imgH = this.offsetHeight;\n      fist.p = coords[this.id];\n      fist.f();\n\n      $('#apmask_' + this.id).click( function() {\n        $('#' + this.id).click();\n        return false;\n      });\n    });\n  });\n})();";
 			$('#rj').append('<code>' + js + '</code>');
 
 			// finish
