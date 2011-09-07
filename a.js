@@ -329,22 +329,28 @@
 					if (ec === 100000) { return false; }
 				}
 				
-				/*
 				// remove extraneous points
 				// points that form a straight line aren't needed
 				p = { x: [B.x[0]], y: [B.y[0]] };	// points we're keeping
-				this.l = { x: B.x[0], y: B.y[0] };	// last
+				t = { type: '', x: [B.x[0]], y: [B.y[0]] };	// straight line tmp
 				for (j=1; j<B.x.length; j++) {
-				if (B.x[j] !== p.x[p.x.length - 1] && B.y[j] !== p.y[p.y.length - 1]) {
-						p.x.push(this.l.x);
-						p.y.push(this.l.y);
-						p.x.push(B.x[j]);
-						p.y.push(B.y[j]);
+					if ((B.x[j] === t.x[t.x.length - 1] && (t.type === '' || t.type === 'x') && (B.y[j] === t.y[t.y.length - 1] + 1 || B.y[j] === t.y[t.y.length - 1] - 1))) {
+						t.type = 'x'
+						t.x.push(B.x[j]);
+						t.y.push(B.y[j]);
+					} else if ((B.y[j] === t.y[t.y.length - 1] && (t.type === '' || t.type === 'y') && (B.x[j] === t.x[t.x.length - 1] + 1 || B.x[j] === t.x[t.x.length - 1] - 1))) {
+						t.type = 'y'
+						t.x.push(B.x[j]);
+						t.y.push(B.y[j]);
+					} else {
+						p.x.push(t.x[0]);
+						p.y.push(t.y[0]);
+						p.x.push(t.x[t.x.length - 1]);
+						p.y.push(t.y[t.y.length - 1]);
+						t = { type: '', x: [B.x[j]], y: [B.y[j]] };
 					}
-					this.l.x = B.x[j]; this.l.y = B.y[j];
 				}
-				*/
-				p = B;
+
 				
 				// ...also, using Jacob's stop criterion can cause the set of points to be doubled
 				// we'll address that by converting to a string, splitting in two, and replacing extra instances of the original
