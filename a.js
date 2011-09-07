@@ -280,14 +280,18 @@
 				// define T as a square tesselation containing a connected component P on opaque cells
 				// define M(a) to be the Moore neighborhood of pixel a
 				var B = { x: [], y: [] },			// output of boundary pixels. set B to be empty
+					bx,
+					by,
 					c = { x: 0, y: 0 },				// current pixel under consideration, i.e. c is in M(p)
 					ec = 0,							// emergency counter, to make sure we don't get stuck in an infinite loop
 					imgPD = this.imgPD[i],			// the image data
 					j,								// an index / counter
 					p = { x: this.imgH-1, y: 0 },	// current boundary pixel
-					pathstr = {},					// object containing strings of coordinates
+					pstr = {},					// object containing strings of coordinates
 					s,								// the starting opaque pixel
-					sc = 0;							// startcount, a counter for how many times we've traced back to the start
+					sc = 0,							// startcount, a counter for how many times we've traced back to the start
+					tx,
+					ty;
 
 				this.px = 0;						// the pixel data point under consideration
 				this.l = { y: this.imgH, x: 0 };	// last pixel, ie pixel from which s was entered
@@ -326,28 +330,32 @@
 					}
 
 					ec++;
-					if (ec === 100000) { return false; }
+					if (ec === 100000) { return bf; }
 				}
 				
 				// remove extraneous points
 				// points that form a straight line aren't needed
-				p = { x: [B.x[0]], y: [B.y[0]] };	// points we're keeping
-				t = { type: '', x: [B.x[0]], y: [B.y[0]] };	// straight line tmp
+				p = { x: [B.x[0]], y: [B.y[0]] };			// points we're keeping
+				t = { t: '', x: [B.x[0]], y: [B.y[0]] };	// straight line tmp
 				for (j=1; j<B.x.length; j++) {
-					if ((B.x[j] === t.x[t.x.length - 1] && (t.type === '' || t.type === 'x') && (B.y[j] === t.y[t.y.length - 1] + 1 || B.y[j] === t.y[t.y.length - 1] - 1))) {
-						t.type = 'x'
-						t.x.push(B.x[j]);
-						t.y.push(B.y[j]);
-					} else if ((B.y[j] === t.y[t.y.length - 1] && (t.type === '' || t.type === 'y') && (B.x[j] === t.x[t.x.length - 1] + 1 || B.x[j] === t.x[t.x.length - 1] - 1))) {
-						t.type = 'y'
-						t.x.push(B.x[j]);
-						t.y.push(B.y[j]);
+					bx = B.x[j];
+					by = B.y[j];
+					tx = t.x[t.x.length - 1];
+					ty = t.y[t.y.length - 1];
+					if ((bx === tx && (t.t !== 'y') && (by === ty + 1 || by === ty - 1))) {
+						t.t = 'x'
+						t.x.push(bx);
+						t.y.push(by);
+					} else if ((by === ty && (t.t !== 'x') && (bx === tx + 1 || bx === tx - 1))) {
+						t.t = 'y'
+						t.x.push(bx);
+						t.y.push(by);
 					} else {
 						p.x.push(t.x[0]);
 						p.y.push(t.y[0]);
-						p.x.push(t.x[t.x.length - 1]);
-						p.y.push(t.y[t.y.length - 1]);
-						t = { type: '', x: [B.x[j]], y: [B.y[j]] };
+						p.x.push(tx);
+						p.y.push(ty);
+						t = { t: '', x: [bx], y: [by] };
 					}
 				}
 
@@ -357,16 +365,16 @@
 				// hacky kinda, but it should work
 				for (j=0; j<p.x.length; j++) {
 					if (!isNaN(p.x[j]) && !isNaN(p.y[j])) {
-						pathstr.x += p.x[j] + ',';
-						pathstr.y += p.y[j] + ',';
+						pstr.x += p.x[j] + ',';
+						pstr.y += p.y[j] + ',';
 					}
 				}
-				pathstr.xh = pathstr.x.substr(0,pathstr.x.length/2);	// half the x coords
-				pathstr.yh = pathstr.y.substr(0,pathstr.y.length/2);	// half the y coords
-				pathstr.xn = pathstr.x.replace(pathstr.xh,'');			// new x coords
-				pathstr.yn = pathstr.y.replace(pathstr.yh,'');			// new y coords
+				pstr.xh = pstr.x.substr(0,pstr.x.length/2);	// half the x coords
+				pstr.yh = pstr.y.substr(0,pstr.y.length/2);	// half the y coords
+				pstr.xn = pstr.x.replace(pstr.xh,'');			// new x coords
+				pstr.yn = pstr.y.replace(pstr.yh,'');			// new y coords
 
-				if (pathstr.xn.length < pathstr.x.length && pathstr.yn.length < pathstr.y.length) {
+				if (pstr.xn.length < pstr.x.length && pstr.yn.length < pstr.y.length) {
 					p.x = p.x.splice(p.x.length/2-1);
 					p.y = p.y.splice(p.y.length/2-1);
 				}
