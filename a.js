@@ -308,7 +308,6 @@
 				// stop once you've entered the start pixel twice from the same place
 				// (though we're not actually checking for that right now)
 				while (sc < 2) {
-
 					if (s.x === c.x && s.y === c.y) { sc++; }
 					this.px = 4*c.y*this.imgW + 4*(c.x+1) - 1;
 					t = imgPD[this.px];
@@ -329,14 +328,14 @@
 					ec++;
 					if (ec === 100000) { return false; }
 				}
-
+				
+				/*
 				// remove extraneous points
 				// points that form a straight line aren't needed
-				p = { x: [B.x[0]], y: [B.y[0]] };
-				this.l = { x: B.x[0], y: B.y[0] };
-
+				p = { x: [B.x[0]], y: [B.y[0]] };	// points we're keeping
+				this.l = { x: B.x[0], y: B.y[0] };	// last
 				for (j=1; j<B.x.length; j++) {
-					if (B.x[j] !== p.x[p.x.length - 1] && B.y[j] !== p.y[p.y.length - 1]) {
+				if (B.x[j] !== p.x[p.x.length - 1] && B.y[j] !== p.y[p.y.length - 1]) {
 						p.x.push(this.l.x);
 						p.y.push(this.l.y);
 						p.x.push(B.x[j]);
@@ -344,7 +343,9 @@
 					}
 					this.l.x = B.x[j]; this.l.y = B.y[j];
 				}
-
+				*/
+				p = B;
+				
 				// ...also, using Jacob's stop criterion can cause the set of points to be doubled
 				// we'll address that by converting to a string, splitting in two, and replacing extra instances of the original
 				// hacky kinda, but it should work
