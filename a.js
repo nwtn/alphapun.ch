@@ -168,7 +168,9 @@
 
 			/* function to find paths for opaque objects in the image */
 			this.fpo				= function() {
-				var i = 1, r;
+				var ec = 0,	// emergency counter
+					i = 1,	// counter
+					r;		// results
 
 				// canvas!
 				this.pc();
@@ -190,6 +192,8 @@
 					if (r !== bf) { this.po.push(r); }
 
 					i++;
+					ec++;
+					if (ec === 100) { r = bf; }
 				}
 				db.removeChild(this.cnv);
 			};
@@ -197,6 +201,7 @@
 			/* function to find paths for transparent parts of opaque objects (ie holes) in the image */
 			this.fpt				= function() {
 				var ctx = this.ctx,
+					ec = 0,	// emergency counter
 					i,
 					j,
 					k,
@@ -256,6 +261,8 @@
 
 					r = this.mn(k);
 					if (r !== bf) { this.pt.push(r); }
+					ec++;
+					if (ec === 100) { r = bf; }
 				}
 
 				db.removeChild(this.cnv);
@@ -310,13 +317,11 @@
 					// crazily, it's significantly slower to look at values in a wider range
 					// see http://jsperf.com/compares-w-different-numbers
 					if ((t >= this.omn && t <= this.omx) || (imgPD[this.px - 3] === this.mc.r && imgPD[this.px - 2] === this.mc.g && imgPD[this.px - 1] === this.mc.b && imgPD[this.px] === this.mc.a)) {
-						// console.log('opaque: ' + c.x + ', ' + c.y);
 						p.x = c.x; p.y = c.y;					// set p=c
 						B.x.push(c.x); B.y.push(c.y);			// insert c in B
 						c.x = this.l.x; c.y = this.l.y;			// backtrack (move the current pixel c to the pixel from which p was entered)
 						this.l.x = c.x; this.l.y = c.y;
 					} else {
-						// console.log('transparent: ' + c.x + ', ' + c.y);
 						this.l.x = c.x; this.l.y = c.y;
 						c = this.mnfc(p);
 					}
