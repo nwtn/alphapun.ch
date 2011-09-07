@@ -885,7 +885,7 @@
 			epdsp(e);
 
 			if (fs.length === 1) {
-				dge('s').alt = f0.fileName;
+				dge('s').alt = f0.name;
 				if (f0.type.match(/image.png|image.gif/) !== null) {
 					fr.onloadend = function(f) {
 						src.src = f.target.result; // real image to trace
