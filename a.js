@@ -301,8 +301,8 @@
 				// stop once you've entered the start pixel twice from the same place
 				// (though we're not actually checking for that right now)
 				while (sc < 2) {
-					if (s.x === c.x && s.y === c.y) { sc++; }
 
+					if (s.x === c.x && s.y === c.y) { sc++; }
 					this.px = 4*c.y*this.imgW + 4*(c.x+1) - 1;
 					t = imgPD[this.px];
 
@@ -310,17 +310,19 @@
 					// crazily, it's significantly slower to look at values in a wider range
 					// see http://jsperf.com/compares-w-different-numbers
 					if ((t >= this.omn && t <= this.omx) || (imgPD[this.px - 3] === this.mc.r && imgPD[this.px - 2] === this.mc.g && imgPD[this.px - 1] === this.mc.b && imgPD[this.px] === this.mc.a)) {
+						// console.log('opaque: ' + c.x + ', ' + c.y);
 						p.x = c.x; p.y = c.y;					// set p=c
 						B.x.push(c.x); B.y.push(c.y);			// insert c in B
 						c.x = this.l.x; c.y = this.l.y;			// backtrack (move the current pixel c to the pixel from which p was entered)
 						this.l.x = c.x; this.l.y = c.y;
 					} else {
+						// console.log('transparent: ' + c.x + ', ' + c.y);
 						this.l.x = c.x; this.l.y = c.y;
 						c = this.mnfc(p);
 					}
 
 					ec++;
-					if (ec === 100000) { db.removeChild(this.cnv); throw 1; }
+					if (ec === 100000) { return false; }
 				}
 
 				// remove extraneous points
@@ -906,14 +908,7 @@
 			p.imgW = p.img.offsetWidth + 4;
 			p.imgH = p.img.offsetHeight + 4;
 			try { p.fmc(); } catch(e1) { err(em); return bf; }
-			try { p.fpo(); } catch(e2) {
-				if (e2 === 1) {
-					err('Error: the image was too complex.');
-				} else {
-					err('Error: no opaque shapes found.');
-				}
-				return bf; 
-			}
+			try { p.fpo(); } catch(e2) { err('Error: no opaque shapes found, or the image was too complex.'); return bf; }
 			try { p.fpt(); } catch(e3) { err(em); return bf;  }
 			try { p.cp(); } catch(e4) { err(em); return bf;  }
 			try { p.dr(); } catch(e5) { err(em); return bf; }
