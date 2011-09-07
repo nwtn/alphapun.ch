@@ -962,7 +962,7 @@
 			js = js.replace(/	/gm,'  ');
 
 			js = "(function() {\n  var coords = { " + fn + ": [" + p.pTxt.substr(2,p.pTxt.length) + "] };\n\n" + js + "\n\n  $('.alphapunch').each( function() {\n    var fist = new APF();\n\n    $(this).find('.aptarget').each( function() {\n      $(this).wrap('&lt;span style=\"display:inline-block;position:relative\" /&gt;');\n      $(this).append('&lt;span class=\"apmask\" id=\"apmask_' + this.id + '\"&gt;&lt;/span&gt;');\n\n      fist.c = document.getElementById('apmask_' + this.id);\n      fist.ds(0,0,this.offsetWidth,this.offsetHeight);\n    });\n\n    $(this).find('img').each( function() {\n      $(this).wrap('&lt;span style=\"display:inline-block;position:relative\" /&gt;');\n      $(this).after('&lt;span class=\"apmask\" id=\"apmask_' + this.id + '\"&gt;&lt;/span&gt;');\n\n      fist.c = document.getElementById('apmask_' + this.id);\n      fist.imgW = this.offsetWidth;\n      fist.imgH = this.offsetHeight;\n      fist.p = coords[this.id];\n      fist.f();\n\n      $('#apmask_' + this.id).click( function() {\n        $('#' + this.id).click();\n        return false;\n      });\n    });\n  });\n})();";
-			$('#rj').append('<code>' + js + '</code>');
+			$('#rj code').html(js);
 
 			// finish
 			r = dge('r');
