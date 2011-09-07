@@ -215,10 +215,14 @@
 				for (i=0; i < this.po.length; i++) {
 					p = this.po[i];
 					ctx.fillStyle = this.mcr;
-					ctx.beginPath();
-					ctx.moveTo(p.x[0],p.y[0]);
-					for (j=1; j<p.x.length; j++) { ctx.lineTo(p.x[j],p.y[j]); }
-					ctx.fill();
+					if (p.x.length == 1) {
+						ctx.fillRect(p.x[0],p.y[0],1,1);
+					} else {
+						ctx.beginPath();
+						ctx.moveTo(p.x[0],p.y[0]);
+						for (j=1; j<p.x.length; j++) { ctx.lineTo(p.x[j],p.y[j]); }
+						ctx.fill();
+					}
 				}
 
 				// draw the image over it
@@ -330,7 +334,7 @@
 					}
 
 					ec++;
-					if (ec === 100000) { return bf; }
+					if (ec === 100000) { sc = 2; }
 				}
 				
 				// remove extraneous points
@@ -499,11 +503,15 @@
 
 				for (var j=0; j<ps.length; j++) {
 					p = ps[j];
-					ctx.beginPath();
-					ctx.moveTo(p.x[0],p.y[0]);
-					for (var k=1; k<p.x.length; k++) { ctx.lineTo(p.x[k],p.y[k]); }
-					ctx.stroke();
-					ctx.fill();
+					if (p.x.length == 1) {
+						ctx.fillRect(p.x[0],p.y[0],1,1);
+					} else {
+						ctx.beginPath();
+						ctx.moveTo(p.x[0],p.y[0]);
+						for (var k=1; k<p.x.length; k++) { ctx.lineTo(p.x[k],p.y[k]); }
+						ctx.stroke();
+						ctx.fill();
+					}
 				}
 				ctx.lineWidth = 1;
 				ctx.globalCompositeOperation = 'source-over';
