@@ -11,7 +11,7 @@
 		wt;						// warning span (i.e. name of failed test)
 
 	wrn.hide();
-	wrn.html('WEB BROWSER <img src="y.gif" alt="(yಠ,ಠ)y"> Y U NO <span>JAVASCRIPT</span>?!');  // stupid safari
+	wrn.html('WEB BROWSER <img src="y.gif" alt="(yಠ,ಠ)y"> Y U NO <span>WORK</span>?!');  // stupid safari
 	wt = $('#w span');			// warning span (i.e. name of failed test)
 	m.show();
 
@@ -30,6 +30,7 @@
 	
 	/* display an error (or other message) */
 	function err(em) {
+		if (!em) { em = 'Error. Try again?'; }
 		msg.html(em).addClass('on');		
 		setTimeout(function() { msg.removeClass('on'); }, 5000);
 	}
@@ -66,19 +67,19 @@
 
 
 
-		/* AlphaPunchPencil -- to trace shape **/
+		/* AlphaPunchPencil -- to trace shape */
 		var APP = function() {
-			this.cnv				= dce('canvas');				// canvas
-			this.ctx				= this.cnv.getContext('2d');	// canvas context
+			this.cn					= dce('canvas');				// canvas
+			this.ctx				= this.cn.getContext('2d');		// canvas context
 
 			this.img				= null;							// image we're tracing
-			this.imgW				= 0;							// image width
-			this.imgH				= 0;							// image height
-			this.imgP				= [];							// image with padding
-			this.imgPD				= [];							// image pixel data
+			this.iw					= 0;							// image width
+			this.ih					= 0;							// image height
+			this.ip					= [];							// image with padding
+			this.ipd				= [];							// image pixel data
 
 			this.mc					= {};							// a colour not present in the image (hex)
-			this.mcr				= null;							// a colour not present in the image (rgba)
+			this.mcr				= null;							// a colour not present in the image (rgb)
 
 			this.omn				= 255;							// minimum opacity to count as opaque
 			this.omx				= 255;							// maximum opacity to count as opaque
@@ -89,7 +90,7 @@
 			this.po					= [];							// paths of opaque objects
 			this.pt					= [];							// paths of transparent objects
 			this.p					= [];							// path of all objects
-			this.pTxt				= '';							// path of all objects as plain text coords
+			this.ptx				= '';							// path of all objects as plain text coords
 
 			/* combine paths, removing duplicate adjacent points
 			 * function to convert separate path arrays into single path array */
@@ -116,17 +117,17 @@
 			/* function to draw a preview of the mask on a new canvas */
 			this.dr					= function() {
 				// canvas -- a different one than normal
-				var cnv = dce('canvas'),
-					ctx = cnv.getContext('2d')
+				var cn = dce('canvas'),
+					ctx = cn.getContext('2d')
 					rm = dge('rm');	// "rm" == "results mask"
 
-				ctx.clearRect(0,0,this.cnv.width,this.cnv.height);
-				cnv.width = this.imgW;
-				cnv.height = this.imgH;
-				rm.appendChild(cnv);
+				ctx.clearRect(0,0,this.cn.width,this.cn.height);
+				cn.width = this.iw;
+				cn.height = this.ih;
+				rm.appendChild(cn);
 
 				// stupid IE10 doesn't scale canvas proportionally using max-width / max-height
-				$(cnv).css({ width: prv.offsetWidth + 'px', height: prv.offsetHeight + 'px' });
+				$(cn).css({ width: prv.offsetWidth + 'px', height: prv.offsetHeight + 'px' });
 
 				this.dc(ctx, '#000', this.po);
 				this.dc(ctx, '#b45a51', this.pt);
@@ -134,11 +135,11 @@
 
 			/* function to find a specific color in a set of pixel data
 			 * i don't remember why sd is called "sd", but it basically stops the search after finding just one pixel */
-			this.fc					= function(i,r,g,b,a,sd) {
-				var imgPD = this.imgPD[i], j;
+			this.fc					= function(i,r,g,b,sd) {
+				var ipd = this.ipd[i], j;
 				t = [];
-				for (j=0; j<imgPD.length; j=j+4) {
-					if (imgPD[j] === r && imgPD[j+1] === g && imgPD[j+2] === b && imgPD[j+3] === a) {
+				for (j=0; j<ipd.length; j=j+4) {
+					if (ipd[j] === r && ipd[j+1] === g && ipd[j+2] === b && ipd[j+3] === 255) {
 						this.px = Math.floor(j/4);
 						t.push(this.px);
 						if (sd === bt) { return t; }
@@ -154,16 +155,16 @@
 				this.pc();
 
 				this.ctx.drawImage(this.img, 2, 2);
-				this.imgP[0] = this.ctx.getImageData(0, 0, this.imgW, this.imgH);
-				this.imgPD[0] = this.imgP[0].data;
+				this.ip[0] = this.ctx.getImageData(0, 0, this.iw, this.ih);
+				this.ipd[0] = this.ip[0].data;
 
 				while (mct.length !== 0) {
 					this.mc = this.rc();
-					mct = this.fc(0,this.mc.r,this.mc.g,this.mc.b,this.mc.a,bt);
+					mct = this.fc(0,this.mc.r,this.mc.g,this.mc.b,bt);
 				}
-				this.mcr = 'rgba('+this.mc.r+','+this.mc.g+','+this.mc.b+','+this.mc.a+')';
+				this.mcr = 'rgb('+this.mc.r+','+this.mc.g+','+this.mc.b+')';
 
-				db.removeChild(this.cnv);
+				db.removeChild(this.cn);
 			};
 
 			/* function to find paths for opaque objects in the image */
@@ -195,7 +196,7 @@
 					ec++;
 					if (ec === 100) { r = bf; }
 				}
-				db.removeChild(this.cnv);
+				db.removeChild(this.cn);
 			};
 
 			/* function to find paths for transparent parts of opaque objects (ie holes) in the image */
@@ -233,11 +234,11 @@
 				ctx.drawImage(this.img, 3, 3);
 
 				// search for mc (missingColor) pixels; these are transparent bits that weren't previously addressed
-				k = this.imgP.length;
+				k = this.ip.length;
 				this.gImg(k);
-				r = this.fc(k,this.mc.r,this.mc.g,this.mc.b,this.mc.a,bf);
+				r = this.fc(k,this.mc.r,this.mc.g,this.mc.b,bf);
 
-				db.removeChild(this.cnv);
+				db.removeChild(this.cn);
 
 				if (r.length <= 1) { return bf; }
 
@@ -249,12 +250,12 @@
 					this.gImg(k);
 					for (i=0; i<r.length; i++) {
 						this.px = r[i];
-						this.imgPD[k][4*this.px] = 0;
-						this.imgPD[k][4*this.px+1] = 0;
-						this.imgPD[k][4*this.px+2] = 255;
-						this.imgPD[k][4*this.px+3] = 255;
+						this.ipd[k][4*this.px] = 0;
+						this.ipd[k][4*this.px+1] = 0;
+						this.ipd[k][4*this.px+2] = 255;
+						this.ipd[k][4*this.px+3] = 255;
 					}
-					ctx.putImageData(this.imgP[k], 0, 0);
+					ctx.putImageData(this.ip[k], 0, 0);
 
 					// remove old already-found paths
 					this.rp(0);
@@ -269,13 +270,13 @@
 					if (ec === 100) { r = bf; }
 				}
 
-				db.removeChild(this.cnv);
+				db.removeChild(this.cn);
 			};
 
 			/* function to get image data off the canvas */
 			this.gImg				= function(i) {
-				this.imgP[i] = this.ctx.getImageData(0, 0, this.imgW, this.imgH);
-				this.imgPD[i] = this.imgP[i].data;
+				this.ip[i] = this.ctx.getImageData(0, 0, this.iw, this.ih);
+				this.ipd[i] = this.ip[i].data;
 			};
 
 			/* moore-neighbor tracing with jacob's stopping criterion
@@ -288,24 +289,24 @@
 					by,
 					c = { x: 0, y: 0 },				// current pixel under consideration, i.e. c is in M(p)
 					ec = 0,							// emergency counter, to make sure we don't get stuck in an infinite loop
-					imgPD = this.imgPD[i],			// the image data
+					ipd = this.ipd[i],				// the image data
 					j,								// an index / counter
-					p = { x: this.imgH-1, y: 0 },	// current boundary pixel
-					pstr = {},					// object containing strings of coordinates
+					p = { x: this.ih-1, y: 0 },		// current boundary pixel
+					pst = {},						// object containing strings of coordinates
 					s,								// the starting opaque pixel
 					sc = 0,							// startcount, a counter for how many times we've traced back to the start
 					tx,
 					ty;
 
 				this.px = 0;						// the pixel data point under consideration
-				this.l = { y: this.imgH, x: 0 };	// last pixel, ie pixel from which s was entered
+				this.l = { y: this.ih, x: 0 };		// last pixel, ie pixel from which s was entered
 				t = '';								// temp
 
 				// from bottom to top and left to right scan the cells of T until an opaque pixel, s, of P is found
-				s = this.mnfs(i);				// an opaque pixel
-				if (s === bf) { return s; }		// if we can't find s, we've failed
-				B.x.push(s.x); B.y.push(s.y);	// insert s into B
-				p.x = s.x; p.y = s.y;			// set the current boundary point p to s, i.e. p=s
+				s = this.mnfs(i);					// an opaque pixel
+				if (s === bf) { return s; }			// if we can't find s, we've failed
+				B.x.push(s.x); B.y.push(s.y);		// insert s into B
+				p.x = s.x; p.y = s.y;				// set the current boundary point p to s, i.e. p=s
 
 				// backtrack i.e. move to the pixel from which s was entered.
 				// set c to be the next clockwise pixel in M(p).
@@ -317,13 +318,13 @@
 				// (though we're not actually checking for that right now)
 				while (sc < 2) {
 					if (s.x === c.x && s.y === c.y) { sc++; }
-					this.px = 4*c.y*this.imgW + 4*(c.x+1) - 1;
-					t = imgPD[this.px];
+					this.px = 4*c.y*this.iw + 4*(c.x+1) - 1;
+					t = ipd[this.px];
 
 					// if c matches opacity criteria...
 					// crazily, it's significantly slower to look at values in a wider range
 					// see http://jsperf.com/compares-w-different-numbers
-					if ((t >= this.omn && t <= this.omx) || (imgPD[this.px - 3] === this.mc.r && imgPD[this.px - 2] === this.mc.g && imgPD[this.px - 1] === this.mc.b && imgPD[this.px] === this.mc.a)) {
+					if ((t >= this.omn && t <= this.omx) || (ipd[this.px - 3] === this.mc.r && ipd[this.px - 2] === this.mc.g && ipd[this.px - 1] === this.mc.b && ipd[this.px] === 255)) {
 						p.x = c.x; p.y = c.y;					// set p=c
 						B.x.push(c.x); B.y.push(c.y);			// insert c in B
 						c.x = this.l.x; c.y = this.l.y;			// backtrack (move the current pixel c to the pixel from which p was entered)
@@ -369,16 +370,16 @@
 				// hacky kinda, but it should work
 				for (j=0; j<p.x.length; j++) {
 					if (!isNaN(p.x[j]) && !isNaN(p.y[j])) {
-						pstr.x += p.x[j] + ',';
-						pstr.y += p.y[j] + ',';
+						pst.x += p.x[j] + ',';
+						pst.y += p.y[j] + ',';
 					}
 				}
-				pstr.xh = pstr.x.substr(0,pstr.x.length/2);	// half the x coords
-				pstr.yh = pstr.y.substr(0,pstr.y.length/2);	// half the y coords
-				pstr.xn = pstr.x.replace(pstr.xh,'');			// new x coords
-				pstr.yn = pstr.y.replace(pstr.yh,'');			// new y coords
+				pst.xh = pst.x.substr(0,pst.x.length/2);	// half the x coords
+				pst.yh = pst.y.substr(0,pst.y.length/2);	// half the y coords
+				pst.xn = pst.x.replace(pst.xh,'');			// new x coords
+				pst.yn = pst.y.replace(pst.yh,'');			// new y coords
 
-				if (pstr.xn.length < pstr.x.length && pstr.yn.length < pstr.y.length) {
+				if (pst.xn.length < pst.x.length && pst.yn.length < pst.y.length) {
 					p.x = p.x.splice(p.x.length/2-1);
 					p.y = p.y.splice(p.y.length/2-1);
 				}
@@ -421,15 +422,15 @@
 
 			/* function for the Moore-neighbor tracing to find s, the starting opaque pixel */
 			this.mnfs				= function(i) {
-				var imgPD = this.imgPD[i],
+				var ipd = this.ipd[i],
 					s = {x: 0, y: 0},
 					x = 0,
 					y = 0;
 
-				for (y=this.imgH-1; y>=0; y--) {
-					for (x=0; x<this.imgW; x++) {
-						this.px = 4*y*this.imgW + 4*(x+1) - 1;
-						t = imgPD[this.px];
+				for (y=this.ih-1; y>=0; y--) {
+					for (x=0; x<this.iw; x++) {
+						this.px = 4*y*this.iw + 4*(x+1) - 1;
+						t = ipd[this.px];
 
 						// crazily, it's significantly slower to look at values in a wider range
 						// see http://jsperf.com/compares-w-different-numbers
@@ -457,12 +458,12 @@
 						pnt = { x: a[i].x[j], y: a[i].y[j] };
 						if (p.length === 0 || pnt.x !== p[p.length-1].x || pnt.y !== p[p.length-1].y) {
 							p.push(pnt);
-							this.pTxt += ', { x: ' + pnt.x + ', y: ' + pnt.y + ' }';
+							this.ptx += ', { x: ' + pnt.x + ', y: ' + pnt.y + ' }';
 						}
 					}
 					if (i>1) {
 						p.push(l);
-						this.pTxt += ', { x: ' + l.x + ', y: ' + l.y + ' }';
+						this.ptx += ', { x: ' + l.x + ', y: ' + l.y + ' }';
 					}
 					this.p = p;
 				}
@@ -470,11 +471,11 @@
 
 			/* function to prepare canvas for use */
 			this.pc					= function() {
-				var cnv = this.cnv;
-				this.ctx.clearRect(0,0,cnv.width,cnv.height);
-				cnv.width = this.imgW;
-				cnv.height = this.imgH;
-				db.appendChild(cnv);
+				var cn = this.cn;
+				this.ctx.clearRect(0,0,cn.width,cn.height);
+				cn.width = this.iw;
+				cn.height = this.ih;
+				db.appendChild(cn);
 			};
 
 			/* function to choose a random colour, used to find mc (missingColor) */
@@ -482,8 +483,7 @@
 				t = {
 					r: Math.round(255*Math.random()),
 					g: Math.round(255*Math.random()),
-					b: Math.round(254*Math.random()), // not 255 because we use blue later to draw transparent segments
-					a: 255
+					b: Math.round(254*Math.random()) // not 255 because we use blue later to draw transparent segments
 				};
 				return t;
 			};
@@ -526,17 +526,17 @@
 
 
 
-		/**S**/
+		/*S*/
 		var APF = function() {
-			this.cnv				= dce('canvas');				// canvas
-			this.ctx				= this.cnv.getContext('2d');	// canvas context
+			this.cn				= dce('canvas');				// canvas
+			this.ctx			= this.cn.getContext('2d');		// canvas context
 
-			this.imgW				= 0;							// image width
-			this.imgH				= 0;							// image height
+			this.iw				= 0;							// image width
+			this.ih				= 0;							// image height
 
-			this.p					= [];							// path
+			this.p				= [];							// path
 
-			this.c					= null;							// container for mask
+			this.c				= null;							// container for mask
 
 			/* function to sort edge points in an array */
 			this.es					= function(a, b) {
@@ -826,7 +826,7 @@
 
 			};
 		};
-		/**E**/
+		/*E*/
 
 
 
@@ -839,7 +839,7 @@
 		var msg = $('#msg'), // message
 			u = $('#u div'), // upload
 			ui = $('#u b'),  // upload icon
-			coords = { sq: [{ x: 56, y: 37 }, { x: 25, y: 37 }, { x: 25, y: 5 }, { x: 57, y: 5 }] },
+			crds = { sq: [{ x: 56, y: 37 }, { x: 25, y: 37 }, { x: 25, y: 5 }, { x: 57, y: 5 }] },
 			src = dge('s'),
 			prv = dge('prv');
 
@@ -866,9 +866,9 @@
 				$(this).after('<span class="apmask" id="apmask_' + this.id + '"></span>');
 
 				f.c = dge('apmask_' + this.id);
-				f.imgW = this.offsetWidth;
-				f.imgH = this.offsetHeight;
-				f.p = coords[this.id];
+				f.iw = this.offsetWidth;
+				f.ih = this.offsetHeight;
+				f.p = crds[this.id];
 				f.f();
 
 				$('#apmask_' + this.id).click( function() {
@@ -894,34 +894,32 @@
 
 			if (fs.length === 1) {
 				dge('s').alt = f0.name;
-				if (f0.type.match(/image.png|image.gif/) !== null) {
+				if (f0.type.match(/.png|.gif/) !== null) {
 					fr.onloadend = function(f) {
 						src.src = f.target.result; // real image to trace
 						prv.src = f.target.result; // preview
 					};
 					fr.readAsDataURL(f0);
 					ui.html('✔');
-					err('Image OK.');
+					err('Image OK!');
 				} else {
 					ui.html('⚠');
 					err('Error: wrong file type.');
 				}
 			} else {
 				ui.html('⚠');
-				err('Error: you may only upload one file.');
+				err('Error: one file only plz.');
 			}
 			$(this).removeClass('h');
 		});
 
 		// do it
 		$('#u a').click(function() {
-			var em = 'Error. Please try again.',
-				f = new APF(),
+			var f = new APF(),
 				fn,
 				p = new APP(),
 				js,
 				jss,
-				jse,
 				r;
 
 			// get ready
@@ -929,22 +927,22 @@
 			$('#rm canvas').remove();	// clear old masks
 
 			// check for missing file
-			if (!src.src || src.src.length < 1) { err('Error: no image uploaded.'); return bf; }
+			if (!src.src || src.src.length < 1) { err('Error: no image.'); return bf; }
 
 			// trace it
 			p.img = src;
-			p.imgW = p.img.offsetWidth + 4;
-			p.imgH = p.img.offsetHeight + 4;
-			try { p.fmc(); } catch(e1) { err(em); return bf; }
-			try { p.fpo(); } catch(e2) { err('Error: no opaque shapes found, or the image was too complex.'); return bf; }
-			try { p.fpt(); } catch(e3) { err(em); return bf;  }
-			try { p.cp(); } catch(e4) { err(em); return bf;  }
-			try { p.dr(); } catch(e5) { err(em); return bf; }
+			p.iw = p.img.offsetWidth + 4;
+			p.ih = p.img.offsetHeight + 4;
+			try { p.fmc(); } catch(e1) { err(''); return bf; }
+			try { p.fpo(); } catch(e2) { err(''); return bf; }
+			try { p.fpt(); } catch(e3) { err(''); return bf;  }
+			try { p.cp(); } catch(e4) { err(''); return bf;  }
+			try { p.dr(); } catch(e5) { err(''); return bf; }
 
 			// draw the mask
 			f = new APF();
-			f.imgW = p.imgW;
-			f.imgH = p.imgH;
+			f.iw = p.iw;
+			f.ih = p.ih;
 			f.p = p.p;
 
 			// update the example HTML code
@@ -960,16 +958,14 @@
 				success: function(data) { js = data; },
 				dataType: 'text'
 			});
-			jss = js.indexOf('/**S**/') + 7;
-			jse = js.indexOf('/**E**/');
-			js = js.substr(jss, jse-jss);
+			jss = js.indexOf('/*S*/') + 7;
+			js = js.substr(jss, js.indexOf('/*E*/') - jss);
 			js = js.replace(/"/gm,'&quot;');
 			js = js.replace(/</gm,'&lt;');
 			js = js.replace(/>/gm,'&gt;');
 			js = js.replace(/dce\(/gm,'document.createElement(');
-			js = js.replace(/	/gm,'  ');
 
-			js = "(function() {\n  var coords = { " + fn + ": [" + p.pTxt.substr(2,p.pTxt.length) + "] };\n\n" + js + "\n\n  $('.alphapunch').each( function() {\n    var fist = new APF();\n\n    $(this).find('.aptarget').each( function() {\n      $(this).wrap('&lt;span style=\"display:inline-block;position:relative\" /&gt;');\n      $(this).append('&lt;span class=\"apmask\" id=\"apmask_' + this.id + '\"&gt;&lt;/span&gt;');\n\n      fist.c = document.getElementById('apmask_' + this.id);\n      fist.ds(0,0,this.offsetWidth,this.offsetHeight);\n    });\n\n    $(this).find('img').each( function() {\n      $(this).wrap('&lt;span style=\"display:inline-block;position:relative\" /&gt;');\n      $(this).after('&lt;span class=\"apmask\" id=\"apmask_' + this.id + '\"&gt;&lt;/span&gt;');\n\n      fist.c = document.getElementById('apmask_' + this.id);\n      fist.imgW = this.offsetWidth;\n      fist.imgH = this.offsetHeight;\n      fist.p = coords[this.id];\n      fist.f();\n\n      $('#apmask_' + this.id).click( function() {\n        $('#' + this.id).click();\n        return false;\n      });\n    });\n  });\n})();";
+			js = "(function() {\n  var coords = { " + fn + ": [" + p.ptx.substr(2,p.ptx.length) + "] };\n\n" + js + "\n\n  $('.alphapunch').each( function() {\n    var fist = new APF();\n\n    $(this).find('.aptarget').each( function() {\n      $(this).wrap('&lt;span style=\"display:inline-block;position:relative\" /&gt;');\n      $(this).append('&lt;span class=\"apmask\" id=\"apmask_' + this.id + '\"&gt;&lt;/span&gt;');\n\n      fist.c = document.getElementById('apmask_' + this.id);\n      fist.ds(0,0,this.offsetWidth,this.offsetHeight);\n    });\n\n    $(this).find('img').each( function() {\n      $(this).wrap('&lt;span style=\"display:inline-block;position:relative\" /&gt;');\n      $(this).after('&lt;span class=\"apmask\" id=\"apmask_' + this.id + '\"&gt;&lt;/span&gt;');\n\n      fist.c = document.getElementById('apmask_' + this.id);\n      fist.iw = this.offsetWidth;\n      fist.ih = this.offsetHeight;\n      fist.p = coords[this.id];\n      fist.f();\n\n      $('#apmask_' + this.id).click( function() {\n        $('#' + this.id).click();\n        return false;\n      });\n    });\n  });\n})();";
 			$('#rj code').html(js);
 
 			// finish

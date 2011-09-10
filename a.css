@@ -23,13 +23,11 @@ header h1 {
 	color: #fdd;
 	font-size: 8em;
 	line-height: .9em;
-	text-transform: uppercase;
 }
 
 header h1::first-letter {
 	color: #faa;
 	letter-spacing: -.02em;
-	text-transform: none;
 	font-size: 1.42em;
 }
 
@@ -44,7 +42,6 @@ header h2 {
 	font-size: 3em;
 	letter-spacing: .03em;
 	text-indent: .2em;
-	text-transform: uppercase;
 }
 
 nav {
@@ -141,8 +138,6 @@ nav a:hover, nav a:focus { background: #e99; }
 
 #abt h2 {
 	margin: 1.5em 0 .1em 0;
-
-	text-transform: uppercase;
 }
 
 #abt h2:first-child { margin-top: 0; }
@@ -301,7 +296,6 @@ ol {
 
 	font-size: 3.3em;
 	text-align: center;
-	text-transform: uppercase;
 }
 
 #r figure {
@@ -539,8 +533,4 @@ footer li { padding: 0 .75em; }
 
 @media only screen and (min-width: 1365px) {
 	body { font-size: 1.07em; }
-}
-
-@media only screen and (min-width: 1439px) {
-	body { font-size: 1.15em; }
 }
