@@ -958,7 +958,7 @@
 				success: function(data) { js = data; },
 				dataType: 'text'
 			});
-			jss = js.indexOf('/*S*/') + 7;
+			jss = js.indexOf('/*S*/') + 5;
 			js = js.substr(jss, js.indexOf('/*E*/') - jss);
 			js = js.replace(/"/gm,'&quot;');
 			js = js.replace(/</gm,'&lt;');
