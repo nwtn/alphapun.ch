@@ -11,13 +11,13 @@
 		wt;						// warning span (i.e. name of failed test)
 
 	wrn.hide();
-	wrn.html('WEB BROWSER <img src="y.gif" alt="(yಠ,ಠ)y"> Y U NO <span>WORK</span>?!');  // stupid safari
+	wrn.html('WEB BROWSER <img src="img/y.gif" alt="(yಠ,ಠ)y"> Y U NO <span>WORK</span>?!');  // stupid safari
 	wt = $('#w span');			// warning span (i.e. name of failed test)
 	m.show();
 
 	/* document.createElement */
 	function dce(el) { return d.createElement(el); }
-	
+
 	/* document.getElementById */
 	function dge(el) { return d.getElementById(el); }
 
@@ -27,14 +27,14 @@
 		e.preventDefault();
 		e.stopPropagation();
 	}
-	
+
 	/* display an error (or other message) */
 	function err(em) {
 		if (!em) { em = 'Error. Try again?'; }
-		msg.html(em).addClass('on');		
+		msg.html(em).addClass('on');
 		setTimeout(function() { msg.removeClass('on'); }, 5000);
 	}
-	
+
 
 	/* test features */
 	function tf() {
@@ -337,7 +337,7 @@
 					ec++;
 					if (ec === 100000) { sc = 2; }
 				}
-				
+
 				// remove extraneous points
 				// points that form a straight line aren't needed
 				p = { x: [B.x[0]], y: [B.y[0]] };			// points we're keeping
@@ -364,7 +364,7 @@
 					}
 				}
 
-				
+
 				// ...also, using Jacob's stop criterion can cause the set of points to be doubled
 				// we'll address that by converting to a string, splitting in two, and replacing extra instances of the original
 				// hacky kinda, but it should work
@@ -452,7 +452,7 @@
 			 * moves points from an array of paths to an output path */
 			this.mp					= function(a) {
 				var i, j, p = this.p, pnt, l = { x: a[0].x[0], y: a[0].y[0] };
-				
+
 				for (i=0; i<a.length; i++) {
 					for (j=0; j<a[i].x.length; j++) {
 						pnt = { x: a[i].x[j], y: a[i].y[j] };
@@ -889,7 +889,7 @@
 			var fs = e.originalEvent.dataTransfer.files,
 				f0 = fs[0],
 				fr = new FileReader();
-				
+
 			epdsp(e);
 
 			if (fs.length === 1) {
