@@ -1,137 +1,96 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+
+<!--[if lt IE 7]>      <html lang="en-ca" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en-ca" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en-ca" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en-ca" class="no-js"> <!--<![endif]-->
+
 	<head>
-		<meta charset="utf-8">
-		<title>αlphaPun.ch</title>
-		<meta name="viewport" content="width=device-width,initial-scale=1">
-		<link rel="stylesheet" href="css/a.css">
-		<script src="//use.typekit.com/frr0jng.js"></script>
-		<script>try{Typekit.load();}catch(e){}</script>
+		<meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+		<title>alphaPun.ch</title>
+        <meta name="description" content="alphaPun.ch will let you click on things behind the transparent parts of an image." />
+
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+		<!-- <link rel="stylesheet" href="css/a.css"> -->
 	</head>
 
 	<body>
 
-		<header>
-			<hgroup>
-				<h1>αLPHAPUN.CH</h1>
-				<h2>PUNCH THROUGH YOUR ALPHA CHANNELS</h2>
-			</hgroup>
+		<header id="header" role="banner">
+			<h1>alphaPun.ch</h1>
+			<p class="subline">Punch through your alpha channels</p>
 
-			<nav><a href="#about">?</a></nav>
+			<nav id="mainnav" role="navigation">
+				<ul>
+					<li><a href="#about">About</a></li>
+					<li><a href="#demo">Demo</a></li>
+					<li><a href="#punch">Punch your image</a></li>
+				</ul>
+			</nav>
 		</header>
 
-		<div id="w">
-			<noscript>
-				WEB BROWSER
-				<img src="img/y.gif" alt="(yಠ,ಠ)y">
-				Y U NO <span>JAVASCRIPT</span>?!
-			</noscript>
-		</div>
+		<p class="js-warning">alphaPun.ch requires JavaScript to function.</p>
 
-		<div id="m">
-			<p id="msg"></p>
+		<main id="main" role="main">
+			<section id="about">
+				<h2>About</h2>
 
-			<section id="abt">
-				<h2>WHAT IS THIS?</h2>
-				<p>An image with a transparent background is like a painting on a window: you can see all sorts of exciting things behind it, but you can’t reach through to touch them. αlphaPun.ch changes that!</p>
-				<p>αlphaPun.ch will trace the opaque part of your <span class="sc">PNG</span> or <span class="sc">GIF</span> image. It will then punch through the alpha channel (i.e. the transparent bit), so you can click on things behind it.</p>
+				<h3>What is this?</h3>
+				<p>An image with a transparent background is like a painting on a window: you can see all sorts of exciting things behind it, but you can’t reach through to touch them. alphaPun.ch changes that!</p>
+				<p>alphaPun.ch will trace the opaque part of your <abbr class="initalism" title="Portable Network Graphics">PNG</abbr> or <abbr class="initialism" title="Graphics Interchange Format">GIF</span> image. It will then punch through the alpha channel (<abbr class="foreign" title="id est; that is">i.e.</abbr> the transparent bit), so you can click on things behind it.</p>
 
-				<h2>WHAT’S REALLY GOING ON?</h2>
-				<p>αlphaPun.ch creates a mask for the opaque part of your pic, along with masks for the clickable content behind it. These masks are placed <em>above</em> the actual image. Clicking a link’s mask will trigger a click on that link.</p>
+				<h2>What’s really going on?</h2>
+				<p>alphaPun.ch creates a mask for the opaque part of the image, along with masks for the clickable content behind it. These masks are placed <em>above</em> the actual image. Clicking a link’s mask will trigger a click on that link.</p>
+				<p>A detailed technical explanation can be found in <a rel="external" href="http://davidnewton.ca/introducing-alphapunch">Introducing alphaPun.ch</a>.</p>
+			</section>
 
-				<h2>DEMO</h2>
-				<div class="d">
+			<section id="demo">
+				<h2>Demo</h2>
+
+				<div class="demo">
 					<figure>
-						<img src="img/sq.gif" alt="square">
-						<figcaption>No αlphaPun.ch == no clicky</figcaption>
+						<img src="img/square.gif" alt="A plain black square on a transparent background." />
+						<figcaption>This image overlaps two links, which are visible through the transparent section. Without alphaPun.ch, the links can’t be clicked.</figcaption>
 					</figure>
 					<ul>
 						<li><a href="#">foo</a></li>
 						<li><a href="#">bar</a></li>
 					</ul>
 				</div>
-				<div class="d ap">
+
+				<div class="demo alphapunch">
 					<figure>
-						<img id="sq" src="img/sq.gif" alt="square">
-						<figcaption>αlphaPun.ch: clickable links</figcaption>
+						<img src="img/square.gif" alt="A plain black square on a transparent background." />
+						<figcaption>The same image, this time using alphaPun.ch. Now, you can click the links through the transparent part of the image.</figcaption>
 					</figure>
 					<ul>
-						<li><a class="apt" id="foo" href="#">foo</a></li>
-						<li><a class="apt" id="bar" href="#">bar</a></li>
+						<li><a class="alphapunch-target" id="foo" href="#">foo</a></li>
+						<li><a class="alphapunch-target" id="bar" href="#">bar</a></li>
 					</ul>
 				</div>
 			</section>
 
-			<section id="u">
-				<ol>
-					<li><div><b>★</b> Drag an image here!</div></li>
-					<li><a href="#">αlphaPunch It!</a></li>
-				</ol>
+			<section id="punch">
+				<h2>Punch your image</h2>
+
+				<p>You can upload your own image below, and alphaPun.ch will generate all the code you need!</p>
+
+				<form id="imgform" name="imgform" action="submit.php" method="POST" enctype="multipart/form-data">
+					<ol>
+						<li>
+							<label for="imgform-choose">Choose an image</label>
+							<input type="file" id="imgform-choose" name="imgform-choose" />
+						</li>
+						<li>
+							<input type="submit" value="alphaPunch It!" />
+						</li>
+					</ol>
+				</form>
 			</section>
-			<section id="r">
-				<h1>RESULTS!</h1>
-				<figure id="rp">
-					<img id="prv">
-					<figcaption>Image</figcaption>
-				</figure>
-				<figure id="rm">
-					<figcaption>Mask</figcaption>
-				</figure>
-				<hr>
-				<figure id="rh">
-					<figcaption>Example <span class="sc">HTML</span></figcaption>
-					<code>&lt;!-- container indicating alphapunching --&gt;
-&lt;div class=&quot;alphapunch&quot;&gt;
-
-  &lt;!--
-    image you alphaPunch'd. needs an ID
-    if you run into trouble positioning it, put it in a container element,
-    like &lt;figure&gt;
-  --&gt;
-  &lt;figure&gt;&lt;img id=&quot;<span class="in">img</span>&quot; src=&quot;<span class="fn">img.png</span>&quot; alt=&quot;<span class="in">img</span>&quot; /&gt;&lt;/figure&gt;
-
-  &lt;!--
-    &quot;target&quot; links you want to click through to. they all need IDs.
-    if you run into trouble positioning them, put them in a container
-    element, like &lt;nav&gt; or &lt;ul&gt; or &lt;div&gt;
-  --&gt;
-  &lt;ul&gt;
-    &lt;li&gt;&lt;a class=&quot;aptarget&quot; id=&quot;foo&quot; href=&quot;javascript:alert('foo')&quot;&gt;foo&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a class=&quot;aptarget&quot; id=&quot;bar&quot; href=&quot;javascript:alert('bar')&quot;&gt;bar&lt;/a&gt;&lt;/li&gt;
-  &lt;/ul&gt;
-
-&lt;/div&gt;
-
-&lt;!-- alphapunch uses some jQuery; it must be present --&gt;
-&lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js&quot;&gt;&lt;/script&gt;</code>
-				</figure>
-				<figure id="rc">
-					<code>/*
-  stacking order from back-to-front is:
-   1. links
-   2. image
-   3. link masks
-   4. image mask
-  IE requires a BG to register click event.
-*/
-
-.alphapunch { position: relative; }
-.alphapunch img {
-  position: relative;
-  z-index: 2;
-}
-.aptarget { display: inline-block; }
-.apmask span { z-index: 3; background: rgba(0,0,0,0.001); }
-img + .apmask span { z-index: 4; }
-					</code>
-					<figcaption>Example <span class="sc">CSS</span></figcaption>
-				</figure>
-				<figure id="rj">
-					<code></code>
-					<figcaption>JavaScript for your site</figcaption>
-				</figure>
-			</section>
-		</div>
+		</main>
 
 		<footer>
 			<ul>
@@ -141,15 +100,22 @@ img + .apmask span { z-index: 4; }
 			</ul>
 		</footer>
 
-		<img id="s">
-
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-		<script src="js/a.js"></script>
+
+		<!--
+		<script src="//use.typekit.com/frr0jng.js"></script>
+		<script>try{Typekit.load();}catch(e){}</script>
+		-->
+
+		<!-- <script src="js/a.js"></script> -->
+
+		<!--
 		<script>
 		    var _gaq=[['_setAccount','UA-25613524-1'],['_setDomainName','none'],['_setAllowLinker',true],['_trackPageview'],['_trackPageLoadTime']];
 			(function(d,t){ var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
 			g.src='//google-analytics.com/ga.js';
 			s.parentNode.insertBefore(g,s)}(document,'script'));
 		</script>
+		-->
 	</body>
 </html>

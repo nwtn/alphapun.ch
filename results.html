@@ -1,0 +1,96 @@
+<section id="results">
+	<h2>Results!</h2>
+
+	<p>Below are: your original image; the mask alphaPun.ch generated; example <abbr class="initialism" title="HyperText Markup Language">HTML</abbr>, <abbr class="initialism" title="Cascading Style Sheets">CSS</abbr>, and <abbr class="initialism" title="JavaScript">JS</abbr> that you can use; and instructions for how to put these all together.</p>
+	<p>Copy below and paste into your site, or <a href="#">download a .zip file</a> that contains everything you need.</p>
+
+	<figure id="results-original">
+		[IMAGE]
+		<figcaption>Image</figcaption>
+	</figure>
+
+	<figure id="results-mask">
+		[MASK]
+		<figcaption>Mask</figcaption>
+	</figure>
+
+	<figure id="results-html">
+		<figcaption>Example <abbr class="initialism" title="HyperText Markup Language">HTML</abbr></figcaption>
+		<code>
+&lt;div class=&quot;alphapunch&quot;&gt;
+  &lt;figure&gt;
+    &lt;img id=&quot;[IMAGENAME]&quot; src=&quot;[FILENAME]&quot; alt=&quot;[IMAGENAME]&quot; /&gt;
+    &lt;figcaption&gt;[IMAGENAME]&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a class=&quot;alphapunch-&quot; id=&quot;foo&quot; href=&quot;javascript:alert('foo')&quot;&gt;foo&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a class=&quot;alphapunch-&quot; id=&quot;bar&quot; href=&quot;javascript:alert('bar')&quot;&gt;bar&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js&quot;&gt;&lt;/script&gt;
+		</code>
+	</figure>
+
+	<figure id="results-css">
+		<code>
+.alphapunch {
+  position: relative;
+}
+
+.alphapunch img {
+  position: relative;
+  z-index: 2;
+}
+
+.alphapunch-target {
+  display: inline-block;
+}
+
+.alphapunch-mask span {
+  z-index: 3;
+  background: rgba(0,0,0,0.001);
+}
+
+img + .alphapunch-mask span {
+  z-index: 4;
+}
+		</code>
+		<figcaption>Example <abbr class="initialism" title="Cascading Style Sheets">CSS</abbr></figcaption>
+	</figure>
+
+	<figure id="results-javascript">
+		[JAVASCRIPT]
+		<figcaption>JavaScript for your site</figcaption>
+	</figure>
+
+	<div class="instructions">
+		<ol>
+			<li>
+				Reference the image in your <abbr class="initialism" title="HyperText Markup Language">HTML</abbr>. You can use the generated example markup, or alter it to suit your needs.
+				<ul>
+					<li>The <code>img</code> <em>and</em> the links behind it must be in a container element with the class <code>alphapunch</code>.</li>
+					<li>If you run into trouble positioning your <code>img</code> and links, try putting the <code>img</code> into its own container element, like <code>figure</code> or <code>div</code>.</li>
+					<li>All links must have the class <code>alphapunch-target</code>, and must have an <abbr class="initialism" title="identification">ID</abbr>. Make note of these <abbr class="initialism" title="identifications">IDs</abbr>, as you’ll need them to configure your JavaScript.</li>
+					<li>If you run into trouble positioning your links, try putting them in a container element, like <code>nav</code>, <code>ul</code>, or <code>div</code>.</li>
+				</ul>
+			</li>
+			<li>
+				Style your image and links. You can use the generated example styles, or alter them to suit your needs.
+				<ul>
+					<li>
+						For alphaPun.ch to work, the stacking order from back-to-front must be:
+						<ol>
+							<li>links (<abbr class="foreign" title="exempli gratia; for example">e.g.</abbr> <code>.alphapunch-target</code>)</li>
+							<li>image (<abbr class="foreign" title="exempli gratia; for example">e.g.</abbr> <code>.alphapunch img</code>)</li>
+							<li>link masks (<abbr class="foreign" title="exempli gratia; for example">e.g.</abbr> <code>.alphapunch-mask span</code>)</li>
+							<li>image masks (<abbr class="foreign" title="exempli gratia; for example">e.g.</abbr> <code>img + .alphapunch-mask span</code>)</li>
+						</ol>
+					</li>
+					<li>Internet Explorer requires the mask elements (<abbr class="foreign" title="exempli gratia; for example">e.g.</abbr> <code>.alphapunch-mask span</code>) to have a <code>background</code> in order to properly register click events.</li>
+				</ul>
+			</li>
+			<li>Call the generated JavaScript. This should not be modified.</li>
+		</ol>
+	</div>
+</section>
