@@ -3,14 +3,7 @@
  */
 
 (function(w) {
-	w.coords = {
-		square: [
-			{ x: 56, y: 37 },
-			{ x: 25, y: 37 },
-			{ x: 25, y: 5 },
-			{ x: 57, y: 5 }
-		]
-	};
+	w.coords = {};
 
 	w.alphaPunchFist = function() {
 		this.canvas			= document.createElement('canvas');	// canvas

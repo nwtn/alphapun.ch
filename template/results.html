@@ -5,12 +5,12 @@
 	<p>Copy below and paste into your site, or <a href="#">download a .zip file</a> that contains everything you need.</p>
 
 	<figure id="results-original">
-		[IMAGE]
+		<img id="imageSource" />
 		<figcaption>Image</figcaption>
 	</figure>
 
 	<figure id="results-mask">
-		[MASK]
+		<canvas id="imageMask"></canvas>
 		<figcaption>Mask</figcaption>
 	</figure>
 
@@ -23,8 +23,8 @@
     &lt;figcaption&gt;[IMAGENAME]&lt;/figcaption&gt;
   &lt;/figure&gt;
   &lt;ul&gt;
-    &lt;li&gt;&lt;a class=&quot;alphapunch-&quot; id=&quot;foo&quot; href=&quot;javascript:alert('foo')&quot;&gt;foo&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a class=&quot;alphapunch-&quot; id=&quot;bar&quot; href=&quot;javascript:alert('bar')&quot;&gt;bar&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a class=&quot;alphapunch-target&quot; id=&quot;foo&quot; href=&quot;javascript:alert('foo')&quot;&gt;foo&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a class=&quot;alphapunch-target&quot; id=&quot;bar&quot; href=&quot;javascript:alert('bar')&quot;&gt;bar&lt;/a&gt;&lt;/li&gt;
   &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -60,7 +60,7 @@ img + .alphapunch-mask span {
 	</figure>
 
 	<figure id="results-javascript">
-		[JAVASCRIPT]
+		<code></code>
 		<figcaption>JavaScript for your site</figcaption>
 	</figure>
 

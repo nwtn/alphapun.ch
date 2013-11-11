@@ -1,27 +1,14 @@
 (function() {
 
 	// the error message element
-	// if it doesn’t already exist, create it
-	var errorMessage = document.getElementById('errorMessage');
-	if (!errorMessage) {
-		errorMessage = document.createElement('p');
-		errorMessage.className = 'error';
-		errorMessage.id = 'errorMessage';
-		document.body.appendChild(errorMessage);
-		errorMessage = document.getElementById('errorMessage');
-	}
-
-	// test features
-	Modernizr.addTest('ajax', function() {
-		var xhr = new XMLHttpRequest();
-		return !!('onprogress' in xhr);
-	});
+	$('body').append('<p class="error" id="errorMessage');
+	var errorMessage = $('#errorMessage');
 
 	// navigation links
 	navigation();
 
 	// if we have canvas and ajax and drag-and-drop, load the drag-and-drop form
-	if (Modernizr.canvas && Modernizr.ajax && Modernizr.draganddrop) {
+	if (Modernizr.canvas && Modernizr.draganddrop) {
 		loadDnd();
 	}
 
@@ -34,58 +21,74 @@
 		if (!message || message === '') {
 			message = 'Error. Try again?';
 		}
-		$(errorMessage).html(message).addClass('active').focus();
+		errorMessage.html(message).addClass('active').focus();
 	}
 
 	// load the drag-and-drop form
 	function loadDnd() {
-		var dnd = new XMLHttpRequest();
-		dnd.onload = loadDndCallback;
-		dnd.open("get", "dragndrop.html", true);
-		dnd.send();
+		$.ajax({
+			url: 'template/dragndrop.html',
+			success: loadDndCallback,
+			dataType: 'html'
+		});
 	}
 
-	function loadDndCallback() {
-		if (this.status === 200) {
-			var imgform = document.getElementById('imgform');
-			imgform.innerHTML = this.responseText;
+	function loadDndCallback(data, textStatus, jqXHR) {
+		if (jqXHR.status !== 200 || textStatus !== 'success') return; // need an error here
 
-			var upload = $('#imgform-dnd'),
-				uploadIcon = $('#imgform-dnd b');
+		$('#imgform').html(data);
 
-			upload.bind('dragenter dragover', function(e) {
-				prevDef(e);
-				$(this).addClass('hover');
-			}).bind('dragleave', function(e) {
-				$(this).removeClass('hover');
-			}).bind('drop', function(e) {
-				var files = e.originalEvent.dataTransfer.files,
-					file = files[0],
-					fileReader = new FileReader();
+		var upload = $('#imgform-dnd'),
+			uploadIcon = $('#imgform-dnd b');
 
-				prevDef(e);
+		upload.bind('dragenter dragover', function(e) {
+			prevDef(e);
+			$(this).addClass('hover');
 
-				if (files.length === 1) {
-					document.getElementById('imageSource').alt = file.name;
-					if (file.type.match(/.png|.gif/) !== null) {
-						fileReader.onloadend = function(f) {
-							imageSource.src = f.target.result; // real image to trace
-							// imageMask.src = f.target.result; // preview
-						};
-						fileReader.readAsDataURL(file);
-						uploadIcon.html('✔');
-						err('Image OK!');
-					} else {
-						uploadIcon.html('⚠');
-						err('Error: wrong file type. Only PNG and GIF files may be uploaded.');
-					}
+		}).bind('dragleave', function(e) {
+			$(this).removeClass('hover');
+
+		}).bind('drop', function(e) {
+			prevDef(e);
+
+			var files = e.originalEvent.dataTransfer.files,
+				file = files[0];
+
+			if (files.length === 1) {
+				if (file.type.match(/.png|.gif/) !== null) {
+					uploadIcon.html('✔');
+					loadResults(file);
 				} else {
 					uploadIcon.html('⚠');
-					err('Error: one file at a time, please.');
+					err('Error: wrong file type. Only PNG and GIF files may be uploaded.');
 				}
-				$(this).removeClass('hover');
-			});
-		}
+
+			} else {
+				uploadIcon.html('⚠');
+				err('Error: one file at a time, please.');
+			}
+
+			$(this).removeClass('hover');
+		});
+	}
+
+	// load results HTML
+	function loadResults(file) {
+		$.ajax({
+			url: 'template/results.html',
+			success: loadResultsCallback(file),
+			dataType: 'html'
+		});
+	}
+
+	function loadResultsCallback(file) {
+		return function(data, textStatus, jqXHR) {
+			if (jqXHR.status !== 200 || textStatus !== 'success') return; // need an error here
+
+			$('#results').remove();
+			$('main').append(data);
+			processUpload(file);
+		};
 	}
 
 	// navigation links
@@ -94,6 +97,84 @@
 			$('section').removeClass('active');
 			$($(this).attr('href')).addClass('active');
 		});
+	}
+
+	// process uploaded image
+	function processUpload(file) {
+		var fileReader = new FileReader(),
+			imageSource = $('#imageSource');
+
+		fileReader.readAsDataURL(file);
+		fileReader.onloadend = function(f) {
+			imageSource.attr('alt', file.name);
+			imageSource.attr('src', f.target.result);
+
+			// call alphaPunchPencil to trace the image
+			var fist = new alphaPunchFist(),		// fist object
+				filename,							// filename of uploaded image
+				pencil = new alphaPunchPencil(),	// pencil object
+				javascript,							// generated JavaScript
+				results;							// results section element
+
+			// get ready
+			errorMessage.removeClass('active');		// clear error messages
+			$('#imageMask').remove();				// clear old masks
+
+			// check for missing file
+			if (!imageSource.attr('src') || imageSource.attr('src') === '') {
+				err('Error: no image.');
+				return false;
+			}
+
+			// trace it
+			pencil.sourceImage = document.getElementById('imageSource');
+			pencil.imageWidth = pencil.sourceImage.offsetWidth + 4;
+			pencil.imageHeight = pencil.sourceImage.offsetHeight + 4;
+			/*
+			try { pencil.fmc(); } catch(e1) { err(''); console.log(1); return false; }
+			try { pencil.fpo(); } catch(e2) { err(''); console.log(2); return false; }
+			try { pencil.fpt(); } catch(e3) { err(''); console.log(3); return false;  }
+			try { pencil.cp(); } catch(e4) { err(''); console.log(4); return false;  }
+			try { pencil.dr(); } catch(e5) { err(''); console.log(5); return false; }
+			*/
+
+			pencil.findMissingColor();
+			pencil.findPathsOpaque();
+			pencil.findPathsTransparent();
+			pencil.combinePaths();
+			pencil.drawPreview();
+
+			// draw the mask
+			fist = new alphaPunchFist();
+			fist.imageWidth = pencil.imageWidth;
+			fist.imageHeight = pencil.imageHeight;
+			fist.path = pencil.path;
+
+			// update the example HTML code
+			var htmlEl = $('#results-html code'),
+				html = htmlEl.html();
+			filename = imageSource.attr('alt');
+			html = html.replace(/\[FILENAME\]/g, filename);
+			filename = filename.replace(/.png|.gif/g,'');
+			html = html.replace(/\[IMAGENAME\]/g, filename);
+			htmlEl.html(html);
+
+			// get the JS code
+			$.ajax({
+				url: 'template/javascript.txt',
+				async: false,
+				success: function(data) { javascript = data; },
+				dataType: 'text'
+			});
+
+			javascript = javascript.replace('w.coords = {}', 'w.coords = { "' + filename + '": [' + pencil.pathsText.substr(2,pencil.pathsText.length) + ']}');
+			$('#results-javascript code').html($('<div />').text(javascript));
+
+			// finish
+			return false;
+		};
+
+		return false;
 	}
 
 	// a small function to prevent default behaviour
