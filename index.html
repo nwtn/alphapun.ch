@@ -15,6 +15,8 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
 
 		<!-- <link rel="stylesheet" href="css/a.css"> -->
+
+		<script src="js/modernizr.js"></script>
 	</head>
 
 	<body>
@@ -32,7 +34,8 @@
 			</nav>
 		</header>
 
-		<p class="js-warning">alphaPun.ch requires JavaScript to function.</p>
+		<p class="warning" id="jsWarning">Warning: alphaPun.ch requires JavaScript to function.</p>
+		<p class="warning" id="jsWarning">Warning: alphaPun.ch requires <code>canvas</code> to function.</p>
 
 		<main id="main" role="main">
 			<section id="about">
@@ -101,6 +104,7 @@
 		</footer>
 
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script src="js/alphapunch.js"></script>
 
 		<!--
 		<script src="//use.typekit.com/frr0jng.js"></script>
