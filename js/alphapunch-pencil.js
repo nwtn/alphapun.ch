@@ -496,5 +496,17 @@
 			context.lineWidth = 1;
 			context.globalCompositeOperation = 'source-over';
 		};
+
+
+		/* trace -- do all the things
+		 * need proper errors here */
+		this.trace = function() {
+			try { this.findMissingColor(); } catch(e) { return false; }
+			try { this.findPathsOpaque(); } catch(e) { return false; }
+			try { this.findPathsTransparent(); } catch(e) { return false; }
+			try { this.combinePaths(); } catch(e) { return false; }
+			try { this.drawPreview(); } catch(e) { return false; }
+			return true;
+		};
 	};
 })(window);

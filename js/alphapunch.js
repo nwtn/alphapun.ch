@@ -12,6 +12,22 @@
 		loadDnd();
 	}
 
+	// demo
+	// optional params:
+	// demoFist.containerClass = 'alphapunch';
+	// demoFist.targetClass = 'alphapunch-target';
+	// demoFist.maskClass = 'alphapunch-mask';
+	var demoFist = new alphaPunchFist();
+	demoFist.coords	= {
+		square: [
+			{ x: 56, y: 37 },
+			{ x: 25, y: 37 },
+			{ x: 25, y: 5 },
+			{ x: 57, y: 5 }
+		]
+	};
+	demoFist.punch();
+
 
 
 
@@ -110,8 +126,7 @@
 			imageSource.attr('src', f.target.result);
 
 			// call alphaPunchPencil to trace the image
-			var fist = new alphaPunchFist(),		// fist object
-				filename,							// filename of uploaded image
+			var filename,							// filename of uploaded image
 				pencil = new alphaPunchPencil(),	// pencil object
 				css,								// generated CSS
 				html,								// generated HTML
@@ -132,28 +147,10 @@
 			pencil.sourceImage = document.getElementById('imageSource');
 			pencil.imageWidth = pencil.sourceImage.offsetWidth + 4;
 			pencil.imageHeight = pencil.sourceImage.offsetHeight + 4;
-
 			pencil.previewContainer = document.getElementById('results-mask');
-
-			/*
-			try { pencil.fmc(); } catch(e1) { err(''); console.log(1); return false; }
-			try { pencil.fpo(); } catch(e2) { err(''); console.log(2); return false; }
-			try { pencil.fpt(); } catch(e3) { err(''); console.log(3); return false;  }
-			try { pencil.cp(); } catch(e4) { err(''); console.log(4); return false;  }
-			try { pencil.dr(); } catch(e5) { err(''); console.log(5); return false; }
-			*/
-
-			pencil.findMissingColor();
-			pencil.findPathsOpaque();
-			pencil.findPathsTransparent();
-			pencil.combinePaths();
-			pencil.drawPreview();
-
-			// draw the mask
-			fist = new alphaPunchFist();
-			fist.imageWidth = pencil.imageWidth;
-			fist.imageHeight = pencil.imageHeight;
-			fist.path = pencil.path;
+			if (!pencil.trace()) {
+				error('Error tracing image');
+			}
 
 			// get the HTML
 			$.ajax({

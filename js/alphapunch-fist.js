@@ -3,15 +3,6 @@
  */
 
 (function(w) {
-	w.coords = {
-		square: [
-			{ x: 56, y: 37 },
-			{ x: 25, y: 37 },
-			{ x: 25, y: 5 },
-			{ x: 57, y: 5 }
-		]
-	};
-
 	w.alphaPunchFist = function() {
 		this.canvas			= document.createElement('canvas');	// canvas
 		this.context		= this.canvas.getContext('2d');		// canvas context
@@ -19,6 +10,10 @@
 		this.imageHeight	= 0;								// image height
 		this.path			= [];								// path
 		this.container		= null;								// container for mask
+		this.coords			= {};								// coords for path
+		this.containerClass	= 'alphapunch';						// class for container element
+		this.targetClass	= 'alphapunch-target';				// class for targets (e.g. links)
+		this.maskClass		= 'alphapunch-mask';				// class for masks
 
 
 		/* function to sort edges in an array */
@@ -328,56 +323,60 @@
 				return false;
 			};
 		};
+
+
+		/* punch */
+		this.punch			= function() {
+			var alphaPunchContainers = document.getElementsByClassName(this.containerClass);
+			for (var i in alphaPunchContainers) {
+				if (!alphaPunchContainers[i].nodeName) continue;
+
+				var fist	= new w.alphaPunchFist(),
+					targets	= alphaPunchContainers[i].getElementsByClassName(this.targetClass),
+					imgs	= alphaPunchContainers[i].getElementsByTagName('img'),
+					newEl,
+					newEl2,
+					j;
+
+				for (j in targets) {
+					if (!targets[j].nodeName) continue;
+
+					newEl = document.createElement('span');
+					newEl.className = this.maskClass;
+					newEl.id = this.maskClass + '-' + targets[j].id;
+					targets[j].appendChild(newEl);
+
+					newEl = document.createElement('span');
+					newEl.style.cssText = 'display: inline-block;  position: relative';
+					targets[j].parentNode.appendChild(newEl);
+					newEl.appendChild(targets[j]);
+
+					fist.container = document.getElementById(this.maskClass + '-' + targets[j].id);
+					fist.addSpan(0, 0, targets[j].offsetWidth, targets[j].offsetHeight);
+				}
+
+				for (j in imgs) {
+					if (!imgs[j].nodeName) continue;
+
+					newEl = document.createElement('span');
+					newEl.style.cssText = 'display: inline-block;  position: relative';
+					imgs[j].parentNode.appendChild(newEl);
+					newEl.appendChild(imgs[j]);
+
+					newEl2 = document.createElement('span');
+					newEl2.className = this.maskClass;
+					newEl2.id = this.maskClass + '-' + imgs[j].id;
+					newEl.appendChild(newEl2);
+
+					fist.container = document.getElementById(this.maskClass + '-' + imgs[j].id);
+					fist.imageWidth = imgs[j].offsetWidth;
+					fist.imageHeight = imgs[j].offsetHeight;
+					fist.path = this.coords[imgs[j].id];
+					fist.drawPolygon();
+
+					document.getElementById(this.maskClass + '-' + imgs[j].id).addEventListener('click', fist.click(imgs[j].id));
+				}
+			}
+		};
 	};
-
-	var alphaPunchContainers = document.getElementsByClassName('alphapunch');
-	for (var i in alphaPunchContainers) {
-		if (!alphaPunchContainers[i].nodeName) continue;
-
-		var fist	= new w.alphaPunchFist(),
-			targets	= alphaPunchContainers[i].getElementsByClassName('alphapunch-target'),
-			imgs	= alphaPunchContainers[i].getElementsByTagName('img'),
-			newEl,
-			newEl2,
-			j;
-
-		for (j in targets) {
-			if (!targets[j].nodeName) continue;
-
-			newEl = document.createElement('span');
-			newEl.className = 'alphapunch-mask';
-			newEl.id = 'alphapunch-mask-' + targets[j].id;
-			targets[j].appendChild(newEl);
-
-			newEl = document.createElement('span');
-			newEl.style.cssText = 'display: inline-block;  position: relative';
-			targets[j].parentNode.appendChild(newEl);
-			newEl.appendChild(targets[j]);
-
-			fist.container = document.getElementById('alphapunch-mask-' + targets[j].id);
-			fist.addSpan(0, 0, targets[j].offsetWidth, targets[j].offsetHeight);
-		}
-
-		for (j in imgs) {
-			if (!imgs[j].nodeName) continue;
-
-			newEl = document.createElement('span');
-			newEl.style.cssText = 'display: inline-block;  position: relative';
-			imgs[j].parentNode.appendChild(newEl);
-			newEl.appendChild(imgs[j]);
-
-			newEl2 = document.createElement('span');
-			newEl2.className = 'alphapunch-mask';
-			newEl2.id = 'alphapunch-mask-' + imgs[j].id;
-			newEl.appendChild(newEl2);
-
-			fist.container = document.getElementById('alphapunch-mask-' + imgs[j].id);
-			fist.imageWidth = imgs[j].offsetWidth;
-			fist.imageHeight = imgs[j].offsetHeight;
-			fist.path = w.coords[imgs[j].id];
-			fist.drawPolygon();
-
-			document.getElementById('alphapunch-mask-' + imgs[j].id).addEventListener('click', fist.click(imgs[j].id));
-		}
-	}
 })(window);
