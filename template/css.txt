@@ -1,0 +1,21 @@
+.alphapunch {
+  position: relative;
+}
+
+.alphapunch img {
+  position: relative;
+  z-index: 2;
+}
+
+.alphapunch-target {
+  display: inline-block;
+}
+
+.alphapunch-mask span {
+  z-index: 3;
+  background: rgba(0,0,0,0.001);
+}
+
+img + .alphapunch-mask span {
+  z-index: 4;
+}

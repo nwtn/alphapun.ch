@@ -6,6 +6,7 @@
 	w.alphaPunchPencil = function() {
 		this.canvas					= document.createElement('canvas');	// canvas
 		this.context				= this.canvas.getContext('2d');		// canvas context
+		this.previewContainer		= null;								// an element that will contain a preview of the resulting mask
 
 		this.sourceImage			= null;								// image we're tracing
 		this.imageWidth				= 0;								// image width
@@ -60,7 +61,7 @@
 			// canvas -- a different one than normal
 			var canvas = document.createElement('canvas'),
 				context = canvas.getContext('2d'),
-				resultsMask = document.getElementById('results-mask');
+				resultsMask = this.previewContainer;
 
 			context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 			canvas.width = this.imageWidth;
@@ -68,8 +69,8 @@
 			resultsMask.appendChild(canvas);
 
 			// IE10 doesn’t scale canvas proportionally using max-width / max-height
-			var imageSource = document.getElementById('imageSource');
-			$(canvas).css({ width: imageSource.offsetWidth + 'px', height: imageSource.offsetHeight + 'px' });
+			var sourceImage = this.sourceImage;
+			canvas.style.cssText = 'width: ' + sourceImage.offsetWidth + 'px;  height: ' + sourceImage.offsetHeight + 'px';
 
 			this.drawPathOnCanvas(context, '#000', this.pathsOpaque);
 			this.drawPathOnCanvas(context, '#b45a51', this.pathsTransparent);

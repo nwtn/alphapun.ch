@@ -1,0 +1,12 @@
+<div class="alphapunch">
+  <figure>
+    <img id="[IMAGENAME]" src="[FILENAME]" alt="[IMAGENAME]" />
+    <figcaption>[IMAGENAME]</figcaption>
+  </figure>
+  <ul>
+    <li><a class="alphapunch-target" id="foo" href="javascript:alert('foo')">foo</a></li>
+    <li><a class="alphapunch-target" id="bar" href="javascript:alert('bar')">bar</a></li>
+  </ul>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>

@@ -113,6 +113,8 @@
 			var fist = new alphaPunchFist(),		// fist object
 				filename,							// filename of uploaded image
 				pencil = new alphaPunchPencil(),	// pencil object
+				css,								// generated CSS
+				html,								// generated HTML
 				javascript,							// generated JavaScript
 				results;							// results section element
 
@@ -130,6 +132,9 @@
 			pencil.sourceImage = document.getElementById('imageSource');
 			pencil.imageWidth = pencil.sourceImage.offsetWidth + 4;
 			pencil.imageHeight = pencil.sourceImage.offsetHeight + 4;
+
+			pencil.previewContainer = document.getElementById('results-mask');
+
 			/*
 			try { pencil.fmc(); } catch(e1) { err(''); console.log(1); return false; }
 			try { pencil.fpo(); } catch(e2) { err(''); console.log(2); return false; }
@@ -150,14 +155,31 @@
 			fist.imageHeight = pencil.imageHeight;
 			fist.path = pencil.path;
 
-			// update the example HTML code
-			var htmlEl = $('#results-html code'),
-				html = htmlEl.html();
+			// get the HTML
+			$.ajax({
+				url: 'template/html.txt',
+				async: false,
+				success: function(data) { html = data; },
+				dataType: 'text'
+			});
+
+			// update the example HTML
 			filename = imageSource.attr('alt');
 			html = html.replace(/\[FILENAME\]/g, filename);
 			filename = filename.replace(/.png|.gif/g,'');
 			html = html.replace(/\[IMAGENAME\]/g, filename);
-			htmlEl.html(html);
+			$('#results-html code').html($('<div />').text(html));
+
+			// get the CSS
+			$.ajax({
+				url: 'template/css.txt',
+				async: false,
+				success: function(data) { css = data; },
+				dataType: 'text'
+			});
+
+			// update the example CSS
+			$('#results-css code').html($('<div />').text(css));
 
 			// get the JS code
 			$.ajax({
@@ -167,6 +189,7 @@
 				dataType: 'text'
 			});
 
+			// update the example JS
 			javascript = javascript.replace('w.coords = {}', 'w.coords = { "' + filename + '": [' + pencil.pathsText.substr(2,pencil.pathsText.length) + ']}');
 			$('#results-javascript code').html($('<div />').text(javascript));
 

@@ -24,10 +24,10 @@
 		/* function to sort edges in an array */
 		this.edgeSort		= function(edgeA, edgeB) {
 			if (edgeA.yMin === edgeB.yMin) {
-				if (edgeA.xValue === edgeB.xValue) {
+				if (edgeA.x === edgeB.x) {
 					return edgeA.yMax - edgeB.yMax;
 				}
-				return edgeA.xValue - edgeB.xValue;
+				return edgeA.x - edgeB.x;
 			}
 			return edgeA.yMin - edgeB.yMin;
 		};
@@ -60,7 +60,7 @@
 				pointA,
 				pointB,
 				scanLine,
-				xValue,
+				x,
 				xMaxGlobal = 0,	// global x max
 				xEnd = 0,		// x end; used for SPAN coords/width
 				xStart = 0,		// x start; used for SPAN coords/width
@@ -106,37 +106,41 @@
 				if (i === this.path.length-1) {
 					pointB = this.path[0];
 				} else {
-					pointB = this.path[i+1];
+					pointB = this.path[i + 1];
 				}
 
 				// maximum y value of the two vertices
-				edge.ymx = pointA.y;
-				if (pointB.yValue > edge.yMax) { edge.yMax = pointB.yValue; }
-				if (edge.yMax > yMaxGlobal) { yMaxGlobal = edge.yMax; }
+				edge.yMax = pointA.y;
+				if (pointB.y > edge.yMax) {
+					edge.yMax = pointB.y;
+				}
+				if (edge.yMax > yMaxGlobal) {
+					yMaxGlobal = edge.yMax;
+				}
 
 				// minimum y value of the two vertices
-				edge.ymn = pointA.y;
-				if (pointB.yValue < edge.yMin) { edge.ymn = pointB.yValue; }
+				edge.yMin = pointA.y;
+				if (pointB.y < edge.yMin) { edge.yMin = pointB.y; }
 				if (edge.yMin < yMinGlobal) { yMinGlobal = edge.yMin; }
 
 				// x value associated with the minimum y value
-				edge.xvl = parseInt(pointA.x,10);
-				if (pointB.yValue < pointA.yValue) { edge.xValue = parseInt(pointB.xValue,10); }
-				if (edge.xValue > xMaxGlobal) { xMaxGlobal = edge.xValue; }
+				edge.x = parseInt(pointA.x, 10);
+				if (pointB.y < pointA.y) { edge.x = parseInt(pointB.x,10); }
+				if (edge.x > xMaxGlobal) { xMaxGlobal = edge.x; }
 
 				// slope of the edge
 				// I'll actually store both m (slope) and 1/m (oneOverSlope)
 				// I also have to check for division by 0, which isn't explicitly mentioned in the algorithm
-				deltaX = pointA.xValue - pointB.xValue;
+				deltaX = pointA.x - pointB.x;
 				if (deltaX === 0) {
 					edge.slope = NaN;
 					edge.oneOverSlope = 0;
 				} else {
-					edge.slope = (pointA.yValue - pointB.yValue) / deltaX;
+					edge.slope = (pointA.y - pointB.y) / deltaX;
 					if (edge.slope === 0) {
 						edge.oneOverSlope = NaN;
 					} else {
-						edge.oneOverSlope = 1/edge.slope;
+						edge.oneOverSlope = 1 / edge.slope;
 					}
 				}
 				edgesAll.push(edge);
@@ -267,16 +271,18 @@
 						Once the first edge is encountered, parity = odd. All points are drawn from
 						this point until the next edge is encountered. Parity is then changed to even.
 				*/
-				for (xValue=0; xValue<=xMaxGlobal; x++) {
+				for (x=0; x<=xMaxGlobal; x++) {
 					for (i=0; i<edgesActive.length; i++) {
-						if (Math.round(edgesActive[i].xValue) === xValue) {
+						if (Math.round(edgesActive[i].x) === x) {
 							if (parity === 0) {
-								xStart = xValue;
+								xStart = x;
 								parity = 1;
 							} else {
-								xEnd = xValue;
+								xEnd = x;
 								xWidth = xEnd - xStart;
-								if (xWidth === 0) { xWidth = 1; }
+								if (xWidth === 0) {
+									xWidth = 1;
+								}
 								this.addSpan(xStart, scanLine, xWidth, 1);
 								parity = 0;
 							}
@@ -300,7 +306,7 @@
 							the next scan-line equals the old scan-line plus one.)
 					*/
 
-					edgesActive[i].xValue = edgesActive[i].xValue + edgesActive[i].oneOverSlope;
+					edgesActive[i].x = edgesActive[i].x + edgesActive[i].oneOverSlope;
 					tmp.push(edgesActive[i]);
 				}
 				edgesActive = tmp.slice(0);
@@ -313,38 +319,65 @@
 
 
 		};
+
+
+		/* clickthrough */
+		this.click			= function(id) {
+			return function(e) {
+				document.getElementById(id).click();
+				return false;
+			};
+		};
 	};
 
+	var alphaPunchContainers = document.getElementsByClassName('alphapunch');
+	for (var i in alphaPunchContainers) {
+		if (!alphaPunchContainers[i].nodeName) continue;
 
-	$('.alphapunch').each(
-		function() {
-			var fist = new w.alphaPunchFist();
+		var fist	= new w.alphaPunchFist(),
+			targets	= alphaPunchContainers[i].getElementsByClassName('alphapunch-target'),
+			imgs	= alphaPunchContainers[i].getElementsByTagName('img'),
+			newEl,
+			newEl2,
+			j;
 
-			$(this).find('.alphapunch-target').each(
-				function() {
-					$(this).wrap('<span style="display:inline-block;position:relative" />');
-					$(this).append('<span class="alphapunch-mask" id="alphapunch-mask-' + this.id + '"></span>');
-					fist.container = document.getElementById('alphapunch-mask-' + this.id);
-					fist.addSpan(0,0,this.offsetWidth,this.offsetHeight);
-			});
+		for (j in targets) {
+			if (!targets[j].nodeName) continue;
 
-			$(this).find('img').each(
-				function() {
-					$(this).wrap('<span style="display:inline-block;position:relative" />');
-					$(this).after('<span class="alphapunch-mask" id="alphapunch-mask-' + this.id + '"></span>');
-					fist.container = document.getElementById('alphapunch-mask-' + this.id);
-					fist.imageWidth = this.offsetWidth;
-					fist.imageHeight = this.offsetHeight;
-					fist.path = w.coords[this.id];
-					fist.drawPolygon();
-					$('#alphapunch-mask-' + this.id).click(
-						function() {
-							$('#' + this.id).click();
-							return false;
-						}
-					);
-				}
-			);
+			newEl = document.createElement('span');
+			newEl.className = 'alphapunch-mask';
+			newEl.id = 'alphapunch-mask-' + targets[j].id;
+			targets[j].appendChild(newEl);
+
+			newEl = document.createElement('span');
+			newEl.style.cssText = 'display: inline-block;  position: relative';
+			targets[j].parentNode.appendChild(newEl);
+			newEl.appendChild(targets[j]);
+
+			fist.container = document.getElementById('alphapunch-mask-' + targets[j].id);
+			fist.addSpan(0, 0, targets[j].offsetWidth, targets[j].offsetHeight);
 		}
-	);
+
+		for (j in imgs) {
+			if (!imgs[j].nodeName) continue;
+
+			newEl = document.createElement('span');
+			newEl.style.cssText = 'display: inline-block;  position: relative';
+			imgs[j].parentNode.appendChild(newEl);
+			newEl.appendChild(imgs[j]);
+
+			newEl2 = document.createElement('span');
+			newEl2.className = 'alphapunch-mask';
+			newEl2.id = 'alphapunch-mask-' + imgs[j].id;
+			newEl.appendChild(newEl2);
+
+			fist.container = document.getElementById('alphapunch-mask-' + imgs[j].id);
+			fist.imageWidth = imgs[j].offsetWidth;
+			fist.imageHeight = imgs[j].offsetHeight;
+			fist.path = w.coords[imgs[j].id];
+			fist.drawPolygon();
+
+			document.getElementById('alphapunch-mask-' + imgs[j].id).addEventListener('click', fist.click(imgs[j].id));
+		}
+	}
 })(window);
