@@ -187,7 +187,7 @@
 			});
 
 			// update the example JS
-			javascript = javascript.replace('w.coords = {}', 'w.coords = { "' + filename + '": [' + pencil.pathsText.substr(2,pencil.pathsText.length) + ']}');
+			javascript = javascript.replace('fist.coords = {}', 'fist.coords = { "' + filename + '": [' + pencil.pathsText.substr(2,pencil.pathsText.length) + ']}');
 			$('#results-javascript code').html($('<div />').text(javascript));
 
 			// finish
